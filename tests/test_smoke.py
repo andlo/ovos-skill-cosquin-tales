@@ -40,5 +40,5 @@ def test_initialize_loads_normally_for_french_device(skill, monkeypatch):
     skill.initialize()
 
     skill._load_index.assert_called_once()
-    assert skill.add_event.call_count == 2
+    assert skill.add_event.call_count == 3
     assert skill.index == {"JEAN DE L'OURS": {}}
