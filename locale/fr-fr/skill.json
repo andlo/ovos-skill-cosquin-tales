@@ -5,11 +5,11 @@
   "pip_spec": "ovos-skill-cosquin-tales",
   "license": "GPL-3.0-or-later",
   "author": "andlo",
-  "name": "Cosquin Tales (provider)",
-  "description": "Emmanuel Cosquin's Lorraine folk tales provider for ovos-common-reading-pipeline-plugin. French only, no translation.",
+  "name": "Contes de Cosquin (fournisseur)",
+  "description": "Fournisseur des contes populaires de Lorraine d'Emmanuel Cosquin pour ovos-common-reading-pipeline-plugin. Uniquement en français, sans traduction.",
   "examples": [
-    "Tell me a story from cosquin",
-    "Read me a fairy tale from lorraine"
+    "Raconte-moi une histoire de cosquin",
+    "Lis-moi une histoire de lorraine"
   ],
   "tags": [
     "entertainment",
