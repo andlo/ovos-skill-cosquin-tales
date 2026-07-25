@@ -9,7 +9,7 @@
   "description": "Emmanuel Cosquin's Lorraine folk tales provider for ovos-common-reading-pipeline-plugin. French only, no translation.",
   "examples": [
     "Tell me a story from cosquin",
-    "Read me a fairy tale from lorraine"
+    "Tell me a fairy tale from lorraine"
   ],
   "tags": [
     "entertainment",
