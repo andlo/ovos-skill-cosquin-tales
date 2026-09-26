@@ -28,7 +28,7 @@ def test_handle_search_matches_by_phrase(skill):
     assert sent.msg_type == COMMON_READING_SEARCH_RESPONSE
     assert sent.data["title"] == "Jean de l'Ours"
     assert sent.data["content_id"] == "JEAN DE L'OURS"
-    assert sent.data["author"] == "collected by Emmanuel Cosquin"
+    assert sent.data["author"] == "Emmanuel Cosquin"
     assert sent.data["source"] == "Project Gutenberg"
 
 

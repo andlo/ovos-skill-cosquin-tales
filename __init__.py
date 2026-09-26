@@ -61,7 +61,7 @@ COLLECTION_ALIASES = ["cosquin", "lorraine", "lorraine tales", "contes de lorrai
                        "emmanuel cosquin"]
 COLLECTION_HINT_THRESHOLD = 0.85
 CONTENT_TYPES = ["story", "tale"]
-AUTHOR_NAME = "collected by Emmanuel Cosquin"
+AUTHOR_NAME = "Emmanuel Cosquin"
 COLLECTION_NAME = "Contes populaires de Lorraine"
 SOURCE_NAME = "Project Gutenberg"
 
