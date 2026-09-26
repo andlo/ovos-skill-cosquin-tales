@@ -57,6 +57,30 @@ the scholarly comparative commentary that follows every story here is
 deliberately excluded from what gets read aloud, not just the next
 story's heading.
 
+## Fetching and what gets read
+
+Reading a story fetches its book from Project Gutenberg once, extracts
+the text of every story in that book, and keeps it on disk under the
+skill's cache directory (`<XDG cache>/mycroft/skills/<skill_id>/`, one
+small JSON file per story). Another story from the same book, or the
+same story after a restart, needs no request. The index points at the
+page itself (`/cache/epub/57892/pg57892-images.html`), not at
+`/ebooks/57892.html.images`, which answered with two redirects. After
+30 days a story is checked again with `If-Modified-Since`, which
+downloads nothing when the book has not changed; a change to the
+extractor (`CACHE_FORMAT`) fetches the book again. When a fetch fails,
+it is not tried again for five minutes, and an older copy is read
+meanwhile if there is one. When the cache directory cannot be written,
+the book's stories are kept in memory instead. Requests say who is
+asking:
+`ovos-skill-cosquin-tales/<version> (+https://github.com/andlo/ovos-skill-cosquin-tales)`.
+
+What is read is the tale, with its songs line by line (the doe's song in
+*La Biche blanche* is a `<div class="verse">` and used to be skipped),
+without the page numbers (`[p. 234]`) or footnote numbers. *Peuil &
+Punce* is printed in the Lorraine dialect beside its French translation;
+only the French is read.
+
 ## Languages
 
 The provider loads only where French is one of the languages the
