@@ -21,11 +21,9 @@ aloud - see below).
 
 > **French only, no translation.** Same situation as
 > `ovos-skill-andrew-lang-tales`/`ovos-skill-bechstein-tales`, just for
-> French. **On any device language other than French, this provider
-> never loads at all**: `initialize()` checks the device's language
-> against `SUPPORTED_LANGUAGES = {"fr"}` before loading the index or
-> registering any bus events, logging why. Set your OVOS device's
-> language to French (`fr-*`) to use this provider.
+> French. **It answers searches made in French (`fr-*`) and stays
+> silent for every other language**, whatever the device's own language
+> is (see "Languages" below).
 
 ## Install
 ```bash
@@ -58,6 +56,34 @@ Story extraction stops each tale at the following `<h3>REMARQUES</h3>` -
 the scholarly comparative commentary that follows every story here is
 deliberately excluded from what gets read aloud, not just the next
 story's heading.
+
+## Languages
+
+The provider always loads, and decides **per search** whether to answer:
+a search made in French gets an answer, any other language gets none.
+The language of a search is the pipeline plugin's `lang` field, else the
+language of the session the search came from, else (an older plugin
+sends neither) the device's own language. That matters on a HiveMind
+hub, where one ovos-core serves many users at once, each session in its
+own language: a French session must get these stories on a hub whose own
+language is English, and an English session must not get French ones. A
+`ping` that names a language (the same way) only gets a pong when that
+is French. Fetching a story is never gated on language - it is addressed
+to this provider directly.
+
+## Title matching
+
+The book prints every title in capitals (*LA BICHE BLANCHE*). Titles
+match regardless of case, accents, punctuation, `&` (read as "et") and
+a leading article, so "la biche blanche", "biche blanche" and "l'oiseau
+de verite" all find their story at full confidence; the part before a
+title's first comma counts too, slightly below the whole title ("la
+bourse"). The title that gets **spoken** is in ordinary case - *La Biche
+Blanche*, *Le Roi d'Angleterre et son Filleul* - since a TTS engine may
+spell capitals out letter by letter; `content_id` stays the index's own
+capitalised title. A search that names no title at all ("raconte-moi
+une histoire") gets one random story at confidence 0.9, or 1.0 when it
+named this collection.
 
 ## Collection hints
 

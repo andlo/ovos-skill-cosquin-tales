@@ -4,9 +4,10 @@ from unittest.mock import MagicMock
 from conftest import COMMON_READING_SEARCH_RESPONSE, COMMON_READING_FETCH_CONTENT_RESPONSE, COMMON_READING_PONG, StoryFetchError
 
 
-def make_message(data=None):
+def make_message(data=None, context=None):
     m = MagicMock()
     m.data = data or {}
+    m.context = context or {}
     m.reply = MagicMock(side_effect=lambda mtype, d: MagicMock(msg_type=mtype, data=d))
     return m
 
@@ -25,7 +26,7 @@ def test_handle_search_matches_by_phrase(skill):
 
     sent = skill.bus.emit.call_args[0][0]
     assert sent.msg_type == COMMON_READING_SEARCH_RESPONSE
-    assert sent.data["title"] == "JEAN DE L'OURS"
+    assert sent.data["title"] == "Jean de l'Ours"
     assert sent.data["content_id"] == "JEAN DE L'OURS"
     assert sent.data["author"] == "collected by Emmanuel Cosquin"
     assert sent.data["source"] == "Project Gutenberg"
@@ -54,12 +55,36 @@ def test_handle_search_surprise_me_with_matching_hint_and_no_phrase(skill):
     skill.handle_search(make_message({"phrase": None, "collection_hint": "cosquin"}))
     skill.bus.emit.assert_called_once()
     data = skill.bus.emit.call_args[0][0].data
-    assert data["title"] in skill.index
+    assert data["content_id"] in skill.index
 
 
-def test_handle_search_no_phrase_no_hint_stays_silent(skill):
+def test_handle_search_surprise_me_with_matching_hint_is_fully_confident(skill):
     skill.index = _sample_index()
-    skill.handle_search(make_message({"phrase": None, "collection_hint": None}))
+    skill.handle_search(make_message({"phrase": None, "collection_hint": "cosquin"}))
+    assert skill.bus.emit.call_args[0][0].data["confidence"] == 1.0
+
+
+def test_handle_search_no_phrase_no_hint_picks_one_random_story(skill):
+    """'raconte-moi une histoire' - no title, no collection: one random
+    story at 0.9, enough to be read without an 'is it that one?' round trip."""
+    skill.index = _sample_index()
+    for data in [{"phrase": None, "collection_hint": None},
+                 {"phrase": None, "content_type": "story"},
+                 {"phrase": ""},
+                 {"phrase": "   "},
+                 {}]:
+        skill.bus.emit.reset_mock()
+        skill.handle_search(make_message(data))
+        skill.bus.emit.assert_called_once()
+        sent = skill.bus.emit.call_args[0][0]
+        assert sent.msg_type == COMMON_READING_SEARCH_RESPONSE
+        assert sent.data["content_id"] in skill.index
+        assert sent.data["confidence"] == 0.9
+
+
+def test_handle_search_no_phrase_other_content_type_stays_silent(skill):
+    skill.index = _sample_index()
+    skill.handle_search(make_message({"phrase": None, "content_type": "horoscope"}))
     skill.bus.emit.assert_not_called()
 
 
