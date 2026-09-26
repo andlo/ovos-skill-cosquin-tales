@@ -109,6 +109,12 @@ LOWERCASE_TITLE_WORDS = {"de", "du", "des", "d", "l", "la", "le", "les", "et",
                          "à", "au", "aux", "en", "son", "sa", "ses", "un", "une"}
 
 
+def configured_languages(langs):
+    """Primary subtags of the languages an installation is configured
+    for (core lang + secondary_langs): ['en-US', 'fr-FR'] -> {'en', 'fr'}."""
+    return {primary_subtag(lang) for lang in langs or [] if lang}
+
+
 def primary_subtag(lang):
     """'en-US', 'en_gb', 'EN' -> 'en'."""
     return (lang or "").replace("_", "-").split("-")[0].lower()
@@ -229,16 +235,30 @@ class CosquinTales(OVOSSkill):
         )
 
     def initialize(self):
-        # always loads, whatever the device language: which language a
-        # search is in is decided per request (see handle_search())
+        # Loads only when French is one of the languages this installation
+        # is configured for: the device's own 'lang' plus 'secondary_langs'
+        # in mycroft.conf. A single English device never loads a French-only
+        # provider; a HiveMind hub serving French-speaking users lists
+        # 'fr-..' in secondary_langs. Once loaded, each request's own
+        # language still decides whether it is answered (handle_search()).
+        self.served = configured_languages(self.native_langs) & SUPPORTED_LANGUAGES
+        if not self.served:
+            self.log.info(
+                f"{self.skill_id}: none of the configured languages "
+                f"{sorted(self.native_langs)} is French (fr-*) - "
+                f"add it to 'secondary_langs' in mycroft.conf to serve "
+                f"French-speaking sessions. Skill stays inert (no bus "
+                f"events registered, index not loaded)."
+            )
+            self.index = {}
+            return
         self._book_soup_cache = {}
         self.index = self._load_index()
         if not self.index:
             self.log.error("No bundled story index found")
         self.log.info(
             f"{self.skill_id}: serving {len(self.index)} French stories "
-            f"to searches made in French (fr-*), whatever the device "
-            f"language ('{self.lang}') is"
+            f"to searches made in French (fr-*)"
         )
         self.add_event(COMMON_READING_SEARCH, self.handle_search)
         self.add_event(f"{COMMON_READING_FETCH_CONTENT}.{self.skill_id}", self.handle_fetch_content)
@@ -314,9 +334,8 @@ class CosquinTales(OVOSSkill):
             lang = SessionManager.get(message).lang
         return lang or None
 
-    @staticmethod
-    def _serves(lang):
-        return primary_subtag(lang) in SUPPORTED_LANGUAGES
+    def _serves(self, lang):
+        return primary_subtag(lang) in self.served
 
     def _best_title(self, phrase):
         """(title, confidence) of the story that best matches what was

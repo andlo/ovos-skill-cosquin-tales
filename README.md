@@ -22,8 +22,8 @@ aloud - see below).
 > **French only, no translation.** Same situation as
 > `ovos-skill-andrew-lang-tales`/`ovos-skill-bechstein-tales`, just for
 > French. **It answers searches made in French (`fr-*`) and stays
-> silent for every other language**, whatever the device's own language
-> is (see "Languages" below).
+> silent for every other language**, and only loads
+> where French is configured - the device language or `secondary_langs` (see "Languages" below).
 
 ## Install
 ```bash
@@ -59,7 +59,20 @@ story's heading.
 
 ## Languages
 
-The provider always loads, and decides **per search** whether to answer:
+The provider loads only where French is one of the languages the
+installation is configured for: the device's own `lang`, or one of
+`secondary_langs` in `mycroft.conf`. A single device in another
+language never loads it. A HiveMind hub whose users speak French lists
+it there, even when the hub's own language is something else:
+
+```json
+{
+  "lang": "en-US",
+  "secondary_langs": ["fr-FR"]
+}
+```
+
+Once loaded, it decides **per search** whether to answer:
 a search made in French gets an answer, any other language gets none.
 The language of a search is the pipeline plugin's `lang` field, else the
 language of the session the search came from, else (an older plugin
