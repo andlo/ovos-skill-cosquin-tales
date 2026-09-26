@@ -29,6 +29,7 @@ def skill(monkeypatch):
     s._bus = MagicMock()
     s._settings = {}
     monkeypatch.setattr(CosquinTales, "lang", "fr-fr", raising=False)
+    s.served = {"fr"}
     s._book_soup_cache = {}
     s.index = {}
     return s
