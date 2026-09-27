@@ -22,7 +22,7 @@ import re
 import requests
 from bs4 import BeautifulSoup
 
-BOOK_URL = "https://www.gutenberg.org/ebooks/57892.html.images"
+BOOK_URL = "https://www.gutenberg.org/cache/epub/57892/pg57892-images.html"
 ROMAN_NUMERAL_RE = re.compile(r"^[IVXLCM]+$")
 
 
